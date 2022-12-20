@@ -1,0 +1,22 @@
+---
+
+- name: Create ES network
+  docker_network:
+    name: "{{ network_name }}"
+
+- name: Start Kibana container
+  docker_container:
+    name: "{{ kibana_cont_name }}"
+    image: "{{ kibana_image }}"
+    env:
+      ELASTICSEARCH_HOSTS: "http://{{ ES_ip_addr }}:9200"
+      ELASTICSEARCH_USERNAME: "kibana"
+      ELASTICSEARCH_PASSWORD: "{{ kibana_password }}"
+    networks:
+    - name: "{{ network_name }}"
+    ports:
+    - 5601:5601
+    log_driver: "{{ log_driver }}"
+    log_options:
+      max-size: "{{ log_max_size }}"
+      max-file: "{{ log_max_file }}"

@@ -1,0 +1,12 @@
+---
+
+- name: nginxlog-exporter
+  systemd:
+    name: prometheus-nginxlog-exporter
+    enabled: yes
+    state: started
+
+- name: nginx-server
+  systemd:
+    name: nginx
+    state: restarted

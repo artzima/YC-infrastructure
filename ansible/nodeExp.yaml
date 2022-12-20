@@ -1,0 +1,7 @@
+---
+
+- name: NodeExporter deploy
+  hosts: web
+  become: true
+  roles:
+    - NodeExporter

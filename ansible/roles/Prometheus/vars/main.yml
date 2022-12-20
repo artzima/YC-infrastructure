@@ -1,0 +1,5 @@
+---
+# vars file for Prometheus
+prometheus_version : 2.40.6
+prometheus_user: prometheus
+prometheus_group: "{{ prometheus_user }}"

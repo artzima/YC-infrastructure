@@ -1,0 +1,18 @@
+---
+
+ES_image: elasticsearch:8.5.2
+ES_cont_name: Elasticsearch
+ES_conf_dir: /usr/share/elasticsearch
+ES_ip_addr: 192.168.11.26
+
+kibana_image: kibana:8.5.2
+kibana_cont_name: Kibana
+kibana_id_addr: 158.160.51.17
+
+network_name: esnet
+log_driver: "json-file"
+log_max_size: "10m"
+log_max_file: "3"
+
+elastic_password: bevAUQjMcvbZwOkNTC2X
+kibana_password: 48MoWqZ2ft5NxGqAx34C

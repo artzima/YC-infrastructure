@@ -1,0 +1,7 @@
+---
+
+- name: Docker Install
+  include_tasks: tasks/docker.yml
+
+- name: Elasticsearch Install
+  include_tasks: tasks/elasticsearch.yml

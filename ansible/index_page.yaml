@@ -1,0 +1,19 @@
+---
+- name: Edit index page.
+  hosts: web
+  become: yes
+
+  vars:
+    src_d: ./index.html.j2
+    dst_d: /var/www/html/index.nginx-debian.html
+
+  tasks:
+    - name: Copying index file
+      copy:
+        src: "{{ src_d }}"
+        dest: "{{ dst_d }}"
+
+    - name: Restart NGINX service      
+      systemd:
+        name: nginx
+        state: restarted

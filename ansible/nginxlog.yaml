@@ -1,0 +1,7 @@
+---
+
+- name: NginxLog Exporter deploy
+  hosts: web
+  become: true
+  roles:
+    - NginxLog

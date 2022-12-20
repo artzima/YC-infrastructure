@@ -1,0 +1,7 @@
+---
+
+- name: ES deploy
+  hosts: es
+  become: true
+  roles:
+    - elasticsearch

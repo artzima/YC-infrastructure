@@ -1,0 +1,7 @@
+---
+
+- name: Kibana deploy
+  hosts: kibana
+  become: true
+  roles:
+    - kibana

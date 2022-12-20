@@ -1,0 +1,7 @@
+---
+
+- name: Filebeat deploy
+  hosts: web
+  become: true
+  roles:
+    - filebeat

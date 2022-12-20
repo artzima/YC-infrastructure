@@ -1,0 +1,8 @@
+---
+
+- name: systemd reload NE
+  systemd:
+    name: node_exporter
+    state: restarted
+    daemon_reload: yes
+    enabled: yes

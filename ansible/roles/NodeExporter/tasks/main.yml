@@ -1,0 +1,60 @@
+---
+
+- name: Create Node Exporter user
+  user:
+    name: "{{ node_exporter_user }}"
+    shell: /bin/false
+    system: true
+    create_home: no
+
+- name: Security Settings For Debian
+  block:
+    - name: Allow TCP Ports
+      iptables:
+        chain: INPUT
+        rule_num: '1'
+        action: insert
+        protocol: tcp
+        jump: ACCEPT
+        destination_port: "{{ item }}"
+      loop: [ '9090', '9093', '9094', '9100' ]
+        
+- name: Create Node Exporter config dir
+  file:
+    path: /etc/node_exporter
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+  
+- name: Download and unzip Node Exporter 
+  unarchive:
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy bin files to Node Exporter
+  copy:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+    dest: "{{ node_exporter_bin }}"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: 0755
+    remote_src: yes
+
+- name: Clean downloaded archive
+  file:
+    path: /tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/
+    state: absent
+
+
+- name: Create .service file for Node Exporter
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+  notify: systemd reload NE
+
+- name: Starting and enable Node Exporter service
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes

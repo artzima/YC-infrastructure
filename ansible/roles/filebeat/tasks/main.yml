@@ -1,0 +1,31 @@
+---
+
+- name: Downloading and installing .deb
+  apt:
+    deb: https://mirror.yandex.ru/mirrors/elastic/8/pool/main/f/filebeat/filebeat-8.1.1-amd64.deb
+  notify:
+    - Start filebeat.service
+
+- name: Copy config file
+  template:
+    src: templates/filebeat.yml
+    dest: /etc/filebeat/filebeat.yml
+  notify:
+    - Restart filebeat.service
+
+- name: Enable Nginx module, copy configuration
+  shell: 
+    cmd: filebeat modules enable nginx
+  become: yes
+
+- name: Copy nginx.yml in modules dir
+  copy:
+    src: templates/nginx.yml
+    dest: /etc/filebeat/modules.d/nginx.yml
+
+- name: Set up assest
+  shell:
+    cmd: filebeat setup
+  become: yes
+  notify:
+    - Restart filebeat.service

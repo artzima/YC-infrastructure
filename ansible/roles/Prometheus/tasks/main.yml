@@ -1,0 +1,70 @@
+---
+
+- name: Create Prometheus User 
+  user:
+    name: "{{ prometheus_user }}"
+    create_home: no
+    shell: /bin/false
+
+- name: Create directories for Prometheus
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+  loop:
+    - '/tmp/prometheus'
+    - '/etc/prometheus'
+    - '/var/lib/prometheus'
+
+- name: Security Settings For Debian
+  block:
+    - name: Allow TCP Ports
+      iptables:
+        chain: INPUT
+        rule_num: '1'
+        action: insert
+        protocol: tcp
+        jump: ACCEPT
+        destination_port: "{{ item }}"
+      loop: [ '9090', '9093', '9094', '9100', '4040' ]
+
+- name: Download and unzipped Prometheus
+  unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
+    dest: /tmp/prometheus
+    creates: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64
+    remote_src: yes
+
+- name: Copy bin files to Prometheus
+  copy: 
+    src: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}
+    dest: /usr/local/bin/
+    remote_src: yes
+    mode: preserve
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+  loop: [ 'prometheus', 'promtool' ]
+
+- name: Copy config files to Prometheus
+  copy: 
+    src: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}
+    dest: /etc/prometheus/
+    remote_src: yes
+    mode: preserve
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+  loop: [ 'console_libraries', 'consoles', 'prometheus.yml' ]
+
+- name: Create .service file for Prometheus
+  template:
+    src=templates/prometheus.service
+    dest=/etc/systemd/system/
+  notify:
+    - systemd reload
+
+- name: Start Prometheus service 
+  systemd:
+    name: prometheus
+    state: started
+    enabled: yes

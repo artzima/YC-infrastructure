@@ -1,0 +1,7 @@
+---
+
+- name: Prometheus deploy
+  hosts: prometheus
+  become: true
+  roles:
+    - Prometheus
